@@ -33,32 +33,54 @@
 <div id="map"></div>
 <div class="panel">
   <h1>Ontario, California: Major Hotels</h1>
-  <p>Tap a marker for room count, meeting space and seasonal context. Marker size follows room count. Dashed marker is the planned Stadium Village hotel.</p>
+  <p>Tap a marker for room count, meeting space and seasonal context. Marker size follows room count, color shows tier.</p>
   <div class="btns">
     <button id="bCity">Whole city</button>
     <button id="bDist">Hotel district</button>
     <label><input type="checkbox" id="sat" checked> Satellite</label>
   </div>
-  <p class="note">Positions placed by street address; boundary approximate. Room counts as of Oct 2026.</p>
+  <p class="note" style="margin-top:8px"><span style="color:#b3412f">&#9679;</span> Full service &nbsp;<span style="color:#c98a1c">&#9679;</span> Select &nbsp;<span style="color:#2f7d4e">&#9679;</span> Extended stay &nbsp;<span style="color:#6b5ea8">&#9679;</span> Economy &nbsp;<span style="color:#b3412f">&#9711;</span> Planned</p>
+  <p class="note">34 open hotels, 4,713 rooms, of 5,461 citywide (City of Ontario). Positions placed by street address; boundary approximate. Room counts as of Oct 2026.</p>
 </div>
 <script>
-const TMD=6749;
+const TMD=5461;
+const CAT={full:{c:'#b3412f',l:'Full service / convention'},select:{c:'#c98a1c',l:'Select service'},ext:{c:'#2f7d4e',l:'Extended stay'},econ:{c:'#6b5ea8',l:'Economy'},plan:{c:'#b3412f',l:'Planned'}};
 const H=[
- {n:"DoubleTree by Hilton Ontario Airport",a:"222 N Vineyard Ave",r:482,m:"24,224",lat:34.0637,lng:-117.6006,cls:"Full service, adjacent to Convention Center",s:"Largest convention block in the city. Fills first on major Convention Center dates and tends to hold group rates through spring and fall meeting season; summer weekends are the softest window."},
- {n:"Delta Hotels by Marriott Ontario Airport",a:"2200 E Holt Blvd",r:299,m:"19,041",lat:34.0630,lng:-117.5962,cls:"Full service, Convention Center district",s:"Second convention headquarters property. Tracks the same convention calendar as the DoubleTree; business-travel weeknights run strong year-round because of ONT."},
- {n:"Ontario Airport Hotel & Conference Center",a:"700 N Haven Ave",r:295,m:"24,000",lat:34.0708,lng:-117.5766,cls:"Full service, renovated 2025",s:"Independent property with the largest ballroom outside the DoubleTree. Social events fill weekends; weekday demand is airport and corporate."},
- {n:"Residence Inn by Marriott Ontario Airport",a:"2025 Convention Center Way",r:200,m:"n/a",lat:34.0662,lng:-117.5975,cls:"Extended stay, adjacent to Convention Center",s:"Extended-stay suites run steadier occupancy than transient hotels; relocation and project crews flatten the seasonal curve."},
- {n:"Holiday Inn Ontario Airport",a:"3400 Shelby St",r:180,m:"n/a",lat:34.0698,lng:-117.5735,cls:"Full service, Haven Ave corridor",s:"Airport and Toyota Arena event demand; arena event nights are the main spikes."},
- {n:"Embassy Suites by Hilton Ontario Airport",a:"3663 E Guasti Rd",r:175,m:"6,000",lat:34.0710,lng:-117.5700,cls:"All-suite, Guasti Rd",s:"Family and sports-tournament demand on weekends, corporate on weeknights. Youth sports seasons push spring and fall weekends, and the Sports Empire will add to that."},
- {n:"Azure Hotel & Suites Ontario Airport",a:"1945 E Holt Blvd",r:167,m:"n/a",lat:34.0630,lng:-117.6020,cls:"Upscale, Holt Blvd",s:"Convention overflow property; moves with the Convention Center schedule."},
- {n:"Sheraton Ontario Airport Hotel",a:"429 N Vineyard Ave",r:165,m:"6,285",lat:34.0668,lng:-117.6008,cls:"Full service, Vineyard at I-10",s:"Park-and-fly packages make ONT holiday travel periods (Thanksgiving through New Year) a relative peak."},
- {n:"Best Western Plus Ontario Airport & Convention Center",a:"209 N Vineyard Ave",r:153,m:"1,275",lat:34.0636,lng:-117.6013,cls:"Select service, walkable to Convention Center",s:"Price-sensitive convention and airport overflow; follows the two big convention hotels at a discount."},
- {n:"Hotel d'Lins Ontario Airport",a:"1818 E Holt Blvd",r:150,m:"1,500",lat:34.0627,lng:-117.6040,cls:"Moderate, Holt Blvd",s:"Airport and highway transient demand; little seasonal swing beyond holiday travel."},
- {n:"Holiday Inn Express & Suites Ontario Airport",a:"2280 S Haven Ave",r:120,m:"4,052",lat:34.0402,lng:-117.5768,cls:"Select service, south of the airport",s:"Logistics and distribution-center business travel from the south Ontario warehouse district keeps weeknights steady; weekends are soft."},
- {n:"Comfort Suites Ontario Airport Convention Center",a:"1811 E Holt Blvd",r:100,m:"1,200",lat:34.0632,lng:-117.6043,cls:"Select service, Holt Blvd",s:"Convention overflow and airport transient."},
- {n:"Hampton Inn & Suites Ontario",a:"4500 E Mills Cir",r:91,m:"3,060",lat:34.0758,lng:-117.5478,cls:"Select service, Ontario Mills",s:"Shopping and Toyota Arena traffic; holiday retail season (Nov to Dec) is a relative peak."},
- {n:"Home2 Suites by Hilton Ontario Airport",a:"4480 E Mills Cir",r:63,m:"3,060",lat:34.0752,lng:-117.5485,cls:"Extended stay, Ontario Mills",s:"Extended stay; flat seasonal profile."},
- {n:"Stadium Village hotel (planned)",a:"Riverside Dr at Vineyard Ave, Ontario Sports Empire",r:227,m:"n/a",lat:34.0060,lng:-117.5980,plan:true,cls:"Planned, part of the Sports Empire's Stadium Village",s:"Not yet open. Announced as a 227-room hotel beside ONT Field (6,500-seat Minor League stadium, opened April 2026) and the community sports complex (8 diamonds, 8 soccer fields, opening October 2026). Expect youth-tournament and game-day weekend demand."}
+ {t:'full',n:"DoubleTree by Hilton Ontario Airport",a:"222 N Vineyard Ave",r:482,m:"24,224",lat:34.0637,lng:-117.6006,cls:"Full service, adjacent to Convention Center",s:"Largest convention block in the city. Fills first on major Convention Center dates and tends to hold group rates through spring and fall meeting season; summer weekends are the softest window."},
+ {t:'full',n:"Delta Hotels by Marriott Ontario Airport",a:"2200 E Holt Blvd",r:299,m:"19,041",lat:34.0630,lng:-117.5962,cls:"Full service, Convention Center district",s:"Second convention headquarters property. Tracks the same convention calendar as the DoubleTree; business-travel weeknights run strong year-round because of ONT."},
+ {t:'full',n:"Ontario Airport Hotel & Conference Center",a:"700 N Haven Ave",r:295,m:"24,000",lat:34.0708,lng:-117.5766,cls:"Full service, renovated 2025",s:"Independent property with the largest ballroom outside the DoubleTree. Social events fill weekends; weekday demand is airport and corporate."},
+ {t:'full',n:"Holiday Inn Ontario Airport",a:"2155 E Convention Center Way",r:180,m:"n/a",lat:34.0658,lng:-117.5948,cls:"Full service, Convention Center district",s:"Convention and airport demand; moves with the Convention Center calendar."},
+ {t:'full',n:"Embassy Suites by Hilton Ontario Airport",a:"3663 E Guasti Rd",r:175,m:"6,000",lat:34.0710,lng:-117.5700,cls:"All-suite, Guasti Rd",s:"Family and sports-tournament demand on weekends, corporate on weeknights. Youth sports seasons push spring and fall weekends, and the Sports Empire will add to that."},
+ {t:'full',n:"Azure Hotel & Suites Ontario Airport",a:"1945 E Holt Blvd",r:167,m:"n/a",lat:34.0630,lng:-117.6020,cls:"Upscale, Holt Blvd",s:"Convention overflow property; moves with the Convention Center schedule."},
+ {t:'full',n:"Sheraton Ontario Airport Hotel",a:"429 N Vineyard Ave",r:165,m:"6,285",lat:34.0668,lng:-117.6008,cls:"Full service, Vineyard at I-10",s:"Park-and-fly packages make ONT holiday travel periods (Thanksgiving through New Year) a relative peak."},
+ {t:'full',n:"Hotel d'Lins Ontario Airport",a:"3400 Shelby St",r:150,m:"1,500",lat:34.0698,lng:-117.5735,cls:"Moderate full service, Haven Ave corridor",s:"Airport, arena and highway transient demand; little seasonal swing beyond holiday travel."},
+ {t:'select',n:"Best Western Plus Ontario Airport & Convention Center",a:"209 N Vineyard Ave",r:153,m:"1,275",lat:34.0636,lng:-117.6013,cls:"Select service, walkable to Convention Center",s:"Price-sensitive convention and airport overflow; follows the two big convention hotels at a discount."},
+ {t:'select',n:"La Quinta Inn & Suites Ontario Airport",a:"3555 Inland Empire Blvd",r:144,m:"n/a",lat:34.0722,lng:-117.5728,cls:"Select service, north of I-10",s:"Airport and arena transient; weekday corporate from the Haven Ave office corridor."},
+ {t:'select',n:"SpringHill Suites Ontario Airport",a:"3595 E Guasti Rd",r:126,m:"n/a",lat:34.0706,lng:-117.5714,cls:"Select service, Guasti Rd",s:"Mirrors Embassy Suites next door: weekend families and tournaments, weekday corporate."},
+ {t:'select',n:"Holiday Inn Express & Suites Ontario Airport",a:"2280 S Haven Ave",r:120,m:"4,052",lat:34.0402,lng:-117.5768,cls:"Select service, south of the airport",s:"Logistics and distribution-center business travel from the south Ontario warehouse district keeps weeknights steady; weekends are soft."},
+ {t:'select',n:"Comfort Suites Ontario Airport Convention Center",a:"1811 E Holt Blvd",r:100,m:"1,200",lat:34.0632,lng:-117.6043,cls:"Select service, Holt Blvd",s:"Convention overflow and airport transient."},
+ {t:'select',n:"Hampton Inn & Suites Ontario",a:"4500 E Mills Cir",r:91,m:"3,060",lat:34.0758,lng:-117.5478,cls:"Select service, Ontario Mills",s:"Shopping and Toyota Arena traffic; holiday retail season (Nov to Dec) is a relative peak."},
+ {t:'select',n:"Hampton Inn Ontario Airport",a:"535 N Turner Ave",r:65,m:"n/a",lat:34.0680,lng:-117.5880,cls:"Select service, Turner Ave at I-10",s:"Airport transient; shares a site with Home2 Suites."},
+ {t:'ext',n:"Residence Inn by Marriott Ontario Airport",a:"2025 Convention Center Way",r:200,m:"n/a",lat:34.0662,lng:-117.5975,cls:"Extended stay, adjacent to Convention Center",s:"Extended-stay suites run steadier occupancy than transient hotels; relocation and project crews flatten the seasonal curve."},
+ {t:'ext',n:"Element by Marriott Ontario",a:"900 Via Piemonte",r:131,m:"n/a",lat:34.0735,lng:-117.5620,cls:"Extended stay, Ontario Center near Toyota Arena",s:"Project crews and arena events; flat seasonal profile."},
+ {t:'ext',n:"Extended Stay America Ontario Airport",a:"3990 Inland Empire Blvd",r:127,m:"480",lat:34.0725,lng:-117.5650,cls:"Extended stay, Inland Empire Blvd",s:"Long-stay workers and relocations; flat seasonal profile."},
+ {t:'ext',n:"Everhome Suites Ontario Airport",a:"1820 E G St",r:118,m:"n/a",lat:34.0674,lng:-117.6050,cls:"Extended stay, G St at I-10",s:"New-build extended stay; long-stay workers and relocations."},
+ {t:'ext',n:"Home2 Suites by Hilton Ontario Airport",a:"535 N Turner Ave",r:63,m:"n/a",lat:34.0684,lng:-117.5872,cls:"Extended stay, Turner Ave at I-10",s:"Extended stay; flat seasonal profile."},
+ {t:'ext',n:"Ayres Suites Ontario Mills Mall",a:"4370 Mills Cir",r:140,m:"n/a",lat:34.0762,lng:-117.5500,cls:"All-suite, Ontario Mills",s:"Shopping and arena traffic."},
+ {t:'econ',n:"Ontario Airport Inn",a:"1801 E G St",r:188,m:"n/a",lat:34.0668,lng:-117.6062,cls:"Economy, G St at I-10",s:"Largest budget block in the city; airport and highway transient."},
+ {t:'econ',n:"Quality Inn Ontario Airport Convention Center",a:"514 N Vineyard Ave",r:124,m:"900",lat:34.0676,lng:-117.6013,cls:"Economy, Vineyard at I-10",s:"Convention overflow at the bottom of the rate ladder."},
+ {t:'econ',n:"SureStay Hotel by Best Western Ontario Airport",a:"3201 Centre Lake Dr",r:114,m:"n/a",lat:34.0665,lng:-117.5790,cls:"Economy, Centre Lake near Haven",s:"Airport transient."},
+ {t:'econ',n:"Comfort Inn & Suites Near Ontario Airport",a:"3333 Shelby St",r:92,m:"240",lat:34.0702,lng:-117.5748,cls:"Economy, Shelby St",s:"Airport and arena transient."},
+ {t:'econ',n:"Baymont by Wyndham Ontario",a:"1655 E 4th St",r:80,m:"n/a",lat:34.0786,lng:-117.6076,cls:"Economy, 4th St",s:"Highway transient."},
+ {t:'econ',n:"Ramada Ontario",a:"1841 E G St",r:72,m:"n/a",lat:34.0671,lng:-117.6042,cls:"Economy, G St at Vineyard",s:"Airport and highway transient."},
+ {t:'econ',n:"Motel 6 Ontario Airport",a:"1560 E 4th St",r:69,m:"n/a",lat:34.0786,lng:-117.6092,cls:"Economy, 4th St",s:"Highway transient."},
+ {t:'econ',n:"Express Inn & Suites Ontario",a:"1150 N Grove Ave",r:58,m:"n/a",lat:34.0752,lng:-117.6272,cls:"Economy, Grove Ave",s:"Highway transient."},
+ {t:'econ',n:"Days Inn by Wyndham Ontario Airport",a:"1405 E 4th St",r:49,m:"n/a",lat:34.0786,lng:-117.6112,cls:"Economy, 4th St at I-10",s:"Highway transient."},
+ {t:'econ',n:"Best Western Ontario Mills Mall",a:"4395 Ontario Mills Pkwy",r:105,m:"600",lat:34.0776,lng:-117.5522,cls:"Economy, Ontario Mills",s:"Shopping and arena traffic."},
+ {t:'econ',n:"Country Inn & Suites by Radisson, Ontario Mills",a:"4674 Ontario Mills Pkwy",r:115,m:"n/a",lat:34.0772,lng:-117.5462,cls:"Economy, Ontario Mills",s:"Shopping and arena traffic."},
+ {t:'econ',n:"Rodeway Inn Ontario Mills Mall",a:"4075 E Guasti Rd",r:100,m:"n/a",lat:34.0708,lng:-117.5642,cls:"Economy, Guasti Rd",s:"Highway transient."},
+ {t:'econ',n:"Hotel Hacienda at Ontario Ranch",a:"2425 S Archibald Ave",r:56,m:"n/a",lat:34.0385,lng:-117.5932,cls:"Economy, south of the airport",s:"Logistics-district transient; the only hotel south of Airport Dr until the Sports Empire opens."},
+ {t:'plan',n:"Stadium Village hotel (planned)",a:"Riverside Dr at Vineyard Ave, Ontario Sports Empire",r:227,m:"n/a",lat:34.0060,lng:-117.5980,plan:true,cls:"Planned, part of the Sports Empire's Stadium Village",s:"Not yet open. Announced as a 227-room hotel beside ONT Field (6,500-seat Minor League stadium, opened April 2026) and the community sports complex (8 diamonds, 8 soccer fields, opening October 2026). Expect youth-tournament and game-day weekend demand."}
 ];
 const LM=[["Ontario Convention Center",34.0650,-117.5995],["Ontario Mills",34.0750,-117.5510],["Toyota Arena",34.0755,-117.5612],["ONT Field / Ontario Sports Empire",34.0055,-117.6000],["Downtown Ontario",34.0630,-117.6510]];
 
@@ -77,11 +99,11 @@ LM.forEach(l=>L.marker([l[1],l[2]],{icon:L.divIcon({className:'',html:`<div clas
 
 H.forEach(h=>{
   const d=Math.round(14+Math.sqrt(h.r)*0.9);
-  const icon=L.divIcon({className:'',html:`<div class="mk${h.plan?' plan':''}" style="width:${d}px;height:${d}px">${h.r}</div>`,iconSize:[d,d],iconAnchor:[d/2,d/2],popupAnchor:[0,-d/2]});
+  const icon=L.divIcon({className:'',html:`<div class="mk${h.plan?' plan':''}" style="width:${d}px;height:${d}px;${h.plan?'':'background:'+CAT[h.t].c}">${h.r}</div>`,iconSize:[d,d],iconAnchor:[d/2,d/2],popupAnchor:[0,-d/2]});
   const share=h.plan?'n/a':(100*h.r/TMD).toFixed(1)+'%';
-  const note=h.plan?'Announced count; not in the TMD total yet.':'Published inventory. Nightly availability is only on the hotel’s booking page; property occupancy is not public.';
+  const note=h.plan?'Announced count; part of the 1,400 rooms the city lists as coming.':'Published inventory. Nightly availability is only on the hotel’s booking page; property occupancy is not public.';
   L.marker([h.lat,h.lng],{icon}).addTo(map).bindPopup(`<h2>${h.n}</h2><p class="addr">${h.a}, Ontario. ${h.cls}.</p>
-   <div class="kv"><div><b>${h.r}</b><span>Rooms</span></div><div><b>${h.m}</b><span>Sq ft meeting</span></div><div><b>${share}</b><span>TMD share</span></div></div>
+   <div class="kv"><div><b>${h.r}</b><span>Rooms</span></div><div><b>${h.m}</b><span>Sq ft meeting</span></div><div><b>${share}</b><span>City share</span></div></div>
    <p class="seas"><i>Seasonal availability</i>${h.s}</p><p class="note">${note}</p>`,{maxWidth:300});
 });
 document.getElementById('bCity').onclick=()=>map.fitBounds([[33.925,-117.683],[34.095,-117.52]]);
