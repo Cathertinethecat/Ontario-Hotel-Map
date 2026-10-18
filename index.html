@@ -9,8 +9,13 @@
 <style>
   html,body{height:100%;margin:0;font-family:"Times New Roman",Times,serif;color:#1d1c19;background:#111}
   #map{position:absolute;inset:0}
-  .panel{position:absolute;left:10px;top:10px;z-index:1000;background:rgba(255,255,255,.94);border-radius:4px;padding:10px 12px;max-width:min(320px,calc(100vw - 20px));box-shadow:0 1px 6px rgba(0,0,0,.35)}
-  .panel h1{font-size:1.15rem;margin:0 0 4px;line-height:1.2}
+  .panel{position:absolute;left:10px;bottom:28px;z-index:600;background:rgba(255,255,255,.94);border-radius:4px;padding:8px 12px;max-width:min(320px,calc(100vw - 20px));box-shadow:0 1px 6px rgba(0,0,0,.35)}
+  .panel h1{font-size:1.05rem;margin:0;line-height:1.2;cursor:pointer;display:flex;justify-content:space-between;gap:10px;align-items:center}
+  .panel h1 small{font-size:.8rem;color:#5f5b50;font-weight:400}
+  .panel .body{display:none;margin-top:6px}
+  .panel.open .body{display:block}
+  .leaflet-popup-pane{z-index:1200}
+  .leaflet-popup{margin-bottom:28px}
   .panel p{margin:0;font-size:.85rem;color:#5f5b50}
   .panel .btns{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
   .panel button,.panel label{font:inherit;font-size:.85rem;border:1px solid #c9c3b2;background:#fff;border-radius:3px;padding:4px 8px;cursor:pointer}
@@ -31,8 +36,9 @@
 </head>
 <body>
 <div id="map"></div>
-<div class="panel">
-  <h1>Ontario, California: Major Hotels</h1>
+<div class="panel" id="panel">
+  <h1 id="ptog">Ontario Hotels <small id="pind">tap for legend &amp; controls</small></h1>
+  <div class="body">
   <p>Tap a marker for room count, meeting space and seasonal context. Marker size follows room count, color shows tier.</p>
   <div class="btns">
     <button id="bCity">Whole city</button>
@@ -41,6 +47,7 @@
   </div>
   <p class="note" style="margin-top:8px"><span style="color:#b3412f">&#9679;</span> Full service &nbsp;<span style="color:#c98a1c">&#9679;</span> Select &nbsp;<span style="color:#2f7d4e">&#9679;</span> Extended stay &nbsp;<span style="color:#6b5ea8">&#9679;</span> Economy &nbsp;<span style="color:#b3412f">&#9711;</span> Planned</p>
   <p class="note">34 open hotels, 4,713 rooms, of 5,461 citywide (City of Ontario). Positions placed by street address; boundary approximate. Room counts as of Oct 2026.</p>
+  </div>
 </div>
 <script>
 const TMD=5461;
@@ -84,7 +91,10 @@ const H=[
 ];
 const LM=[["Ontario Convention Center",34.0650,-117.5995],["Ontario Mills",34.0750,-117.5510],["Toyota Arena",34.0755,-117.5612],["ONT Field / Ontario Sports Empire",34.0055,-117.6000],["Downtown Ontario",34.0630,-117.6510]];
 
+const panel=document.getElementById('panel');
+document.getElementById('ptog').onclick=()=>{panel.classList.toggle('open');document.getElementById('pind').textContent=panel.classList.contains('open')?'tap to hide':'tap for legend & controls';};
 const map=L.map('map',{zoomControl:true}).setView([34.03,-117.60],12);
+map.on('popupopen',()=>{panel.classList.remove('open');document.getElementById('pind').textContent='tap for legend & controls';});
 const sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Imagery &copy; Esri, Maxar, Earthstar Geographics'});
 const ref=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}',{maxZoom:19});
 const lab=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{maxZoom:19});
@@ -104,7 +114,7 @@ H.forEach(h=>{
   const note=h.plan?'Announced count; part of the 1,400 rooms the city lists as coming.':'Published inventory. Nightly availability is only on the hotel’s booking page; property occupancy is not public.';
   L.marker([h.lat,h.lng],{icon}).addTo(map).bindPopup(`<h2>${h.n}</h2><p class="addr">${h.a}, Ontario. ${h.cls}.</p>
    <div class="kv"><div><b>${h.r}</b><span>Rooms</span></div><div><b>${h.m}</b><span>Sq ft meeting</span></div><div><b>${share}</b><span>City share</span></div></div>
-   <p class="seas"><i>Seasonal availability</i>${h.s}</p><p class="note">${note}</p>`,{maxWidth:300});
+   <p class="seas"><i>Seasonal availability</i>${h.s}</p><p class="note">${note}</p>`,{maxWidth:300,autoPanPaddingTopLeft:[10,10],autoPanPaddingBottomRight:[10,60]});
 });
 document.getElementById('bCity').onclick=()=>map.fitBounds([[33.925,-117.683],[34.095,-117.52]]);
 document.getElementById('bDist').onclick=()=>map.fitBounds([[34.036,-117.615],[34.085,-117.540]]);
