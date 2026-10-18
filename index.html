@@ -116,7 +116,7 @@ function nameHTML(h){const u=h.web||h.gocal;return u?`<a href="${u}" target="_bl
 function imgHTML(h){return h.img?`<img class="hphoto" src="${h.img}" alt="" loading="lazy" onerror="this.style.display='none'">`:'';}
 const SHUT={l:'ONT hotel shuttle list',u:'https://www.flyontario.com/parking-transports/hotel-shuttles'};
 function shuttleHTML(h){return h.shuttle?`<span class="badge">ONT courtesy shuttle</span>`:(h.plan?'':`<span class="badge off">No airport shuttle listed</span>`);}
-function svHTML(h){return `<a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${h.lat},${h.lng}" target="_blank" rel="noopener">Street View</a> &middot; <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(h.n+', '+h.a+', Ontario, CA')}" target="_blank" rel="noopener">Google Maps</a>`;}
+function svHTML(h){return `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(h.n+', '+h.a+', Ontario, CA')}" target="_blank" rel="noopener">Open in Google Maps</a>`;}
 function srcHTML(h){
   let out='';
   if(h.shuttle) out+=`<a href="${SHUT.u}" target="_blank" rel="noopener">${SHUT.l}</a>`;
