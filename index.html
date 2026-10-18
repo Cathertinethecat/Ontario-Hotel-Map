@@ -111,6 +111,7 @@ const H=[
 ];
 function nameHTML(h){const u=h.web||h.gocal;return u?`<a href="${u}" target="_blank" rel="noopener">${h.n}</a>`:h.n;}
 function imgHTML(h){return h.img?`<img class="hphoto" src="${h.img}" alt="" loading="lazy" onerror="this.style.display='none'">`:'';}
+function svHTML(h){return `<a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${h.lat},${h.lng}" target="_blank" rel="noopener">Street View</a> &middot; <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(h.n+', '+h.a+', Ontario, CA')}" target="_blank" rel="noopener">Google Maps</a>`;}
 function srcHTML(h){
   let out='';
   if(h.web) out+=`<a href="${h.web}" target="_blank" rel="noopener">Official site</a>`;
@@ -142,7 +143,7 @@ H.forEach(h=>{
   const icon=L.divIcon({className:'',html:`<div class="mk${h.plan?' plan':''}" style="width:${d}px;height:${d}px;${h.plan?'':'background:'+CAT[h.t].c}">${h.r==null?'?':h.r}</div>`,iconSize:[d,d],iconAnchor:[d/2,d/2],popupAnchor:[0,-d/2]});
   const share=(h.plan||h.r==null)?'n/a':(100*h.r/TMD).toFixed(1)+'%';
   const note=h.plan?'Announced count; part of the 1,800+ rooms the City lists as planned.':'Published inventory. Nightly availability is only on the hotel’s booking page; property occupancy is not public.';
-  L.marker([h.lat,h.lng],{icon}).addTo(map).bindPopup(`${imgHTML(h)}<h2>${nameHTML(h)}</h2><p class="addr">${h.a}, Ontario. ${h.cls}.</p>
+  L.marker([h.lat,h.lng],{icon}).addTo(map).bindPopup(`${imgHTML(h)}<h2>${nameHTML(h)}</h2><p class="addr">${h.a}, Ontario. ${h.cls}.<br>${svHTML(h)}</p>
    <div class="kv"><div><b>${h.r==null?'?':h.r}</b><span>Rooms</span></div><div><b>${h.m}</b><span>Sq ft meeting</span></div><div><b>${share}</b><span>City share</span></div></div>
    <p class="seas"><i>Seasonal availability</i>${h.s}</p><p class="seas"><i>Sources</i>${srcHTML(h)}${h.note?'<br><em>'+h.note+'</em>':''}</p><p class="note">${note}</p>`,{maxWidth:300,autoPanPaddingTopLeft:[10,10],autoPanPaddingBottomRight:[10,60]});
 });
