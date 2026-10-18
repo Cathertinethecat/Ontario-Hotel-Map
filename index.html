@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ontario Hotel Map</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  html,body{height:100%;margin:0;font-family:"Times New Roman",Times,serif;color:#1d1c19;background:#111}
+  #map{position:absolute;inset:0}
+  .panel{position:absolute;left:10px;top:10px;z-index:1000;background:rgba(255,255,255,.94);border-radius:4px;padding:10px 12px;max-width:min(320px,calc(100vw - 20px));box-shadow:0 1px 6px rgba(0,0,0,.35)}
+  .panel h1{font-size:1.15rem;margin:0 0 4px;line-height:1.2}
+  .panel p{margin:0;font-size:.85rem;color:#5f5b50}
+  .panel .btns{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .panel button,.panel label{font:inherit;font-size:.85rem;border:1px solid #c9c3b2;background:#fff;border-radius:3px;padding:4px 8px;cursor:pointer}
+  .leaflet-popup-content{font-family:"Times New Roman",Times,serif;font-size:15px;line-height:1.4;margin:12px 14px}
+  .leaflet-popup-content h2{font-size:1.1rem;margin:0 0 2px}
+  .leaflet-popup-content .addr{color:#5f5b50;font-size:.9rem;margin:0 0 8px}
+  .kv{display:flex;gap:8px;margin:0 0 8px}
+  .kv div{background:#efece2;border-radius:3px;padding:5px 8px;flex:1}
+  .kv b{display:block;font-size:1.3rem;line-height:1.1}
+  .kv span{font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;color:#5f5b50}
+  .seas{border-top:1px solid #c9c3b2;padding-top:6px;margin:0;font-size:.9rem}
+  .seas i{display:block;margin-bottom:2px}
+  .note{font-size:.78rem;color:#5f5b50;margin:6px 0 0}
+  .mk{background:#b3412f;color:#fff;border:1.5px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 11px "Times New Roman",Times,serif;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+  .mk.plan{background:#fff;color:#b3412f;border:1.5px dashed #b3412f}
+  .lm{background:rgba(31,78,121,.9);color:#fff;border-radius:3px;padding:2px 6px;font:italic 11px "Times New Roman",Times,serif;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.5)}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="panel">
+  <h1>Ontario, California: Major Hotels</h1>
+  <p>Tap a marker for room count, meeting space and seasonal context. Marker size follows room count. Dashed marker is the planned Stadium Village hotel.</p>
+  <div class="btns">
+    <button id="bCity">Whole city</button>
+    <button id="bDist">Hotel district</button>
+    <label><input type="checkbox" id="sat" checked> Satellite</label>
+  </div>
+  <p class="note">Positions placed by street address; boundary approximate. Room counts as of Oct 2026.</p>
+</div>
+<script>
+const TMD=6749;
+const H=[
+ {n:"DoubleTree by Hilton Ontario Airport",a:"222 N Vineyard Ave",r:482,m:"24,224",lat:34.0637,lng:-117.6006,cls:"Full service, adjacent to Convention Center",s:"Largest convention block in the city. Fills first on major Convention Center dates and tends to hold group rates through spring and fall meeting season; summer weekends are the softest window."},
+ {n:"Delta Hotels by Marriott Ontario Airport",a:"2200 E Holt Blvd",r:299,m:"19,041",lat:34.0630,lng:-117.5962,cls:"Full service, Convention Center district",s:"Second convention headquarters property. Tracks the same convention calendar as the DoubleTree; business-travel weeknights run strong year-round because of ONT."},
+ {n:"Ontario Airport Hotel & Conference Center",a:"700 N Haven Ave",r:295,m:"24,000",lat:34.0708,lng:-117.5766,cls:"Full service, renovated 2025",s:"Independent property with the largest ballroom outside the DoubleTree. Social events fill weekends; weekday demand is airport and corporate."},
+ {n:"Residence Inn by Marriott Ontario Airport",a:"2025 Convention Center Way",r:200,m:"n/a",lat:34.0662,lng:-117.5975,cls:"Extended stay, adjacent to Convention Center",s:"Extended-stay suites run steadier occupancy than transient hotels; relocation and project crews flatten the seasonal curve."},
+ {n:"Holiday Inn Ontario Airport",a:"3400 Shelby St",r:180,m:"n/a",lat:34.0698,lng:-117.5735,cls:"Full service, Haven Ave corridor",s:"Airport and Toyota Arena event demand; arena event nights are the main spikes."},
+ {n:"Embassy Suites by Hilton Ontario Airport",a:"3663 E Guasti Rd",r:175,m:"6,000",lat:34.0710,lng:-117.5700,cls:"All-suite, Guasti Rd",s:"Family and sports-tournament demand on weekends, corporate on weeknights. Youth sports seasons push spring and fall weekends, and the Sports Empire will add to that."},
+ {n:"Azure Hotel & Suites Ontario Airport",a:"1945 E Holt Blvd",r:167,m:"n/a",lat:34.0630,lng:-117.6020,cls:"Upscale, Holt Blvd",s:"Convention overflow property; moves with the Convention Center schedule."},
+ {n:"Sheraton Ontario Airport Hotel",a:"429 N Vineyard Ave",r:165,m:"6,285",lat:34.0668,lng:-117.6008,cls:"Full service, Vineyard at I-10",s:"Park-and-fly packages make ONT holiday travel periods (Thanksgiving through New Year) a relative peak."},
+ {n:"Best Western Plus Ontario Airport & Convention Center",a:"209 N Vineyard Ave",r:153,m:"1,275",lat:34.0636,lng:-117.6013,cls:"Select service, walkable to Convention Center",s:"Price-sensitive convention and airport overflow; follows the two big convention hotels at a discount."},
+ {n:"Hotel d'Lins Ontario Airport",a:"1818 E Holt Blvd",r:150,m:"1,500",lat:34.0627,lng:-117.6040,cls:"Moderate, Holt Blvd",s:"Airport and highway transient demand; little seasonal swing beyond holiday travel."},
+ {n:"Holiday Inn Express & Suites Ontario Airport",a:"2280 S Haven Ave",r:120,m:"4,052",lat:34.0402,lng:-117.5768,cls:"Select service, south of the airport",s:"Logistics and distribution-center business travel from the south Ontario warehouse district keeps weeknights steady; weekends are soft."},
+ {n:"Comfort Suites Ontario Airport Convention Center",a:"1811 E Holt Blvd",r:100,m:"1,200",lat:34.0632,lng:-117.6043,cls:"Select service, Holt Blvd",s:"Convention overflow and airport transient."},
+ {n:"Hampton Inn & Suites Ontario",a:"4500 E Mills Cir",r:91,m:"3,060",lat:34.0758,lng:-117.5478,cls:"Select service, Ontario Mills",s:"Shopping and Toyota Arena traffic; holiday retail season (Nov to Dec) is a relative peak."},
+ {n:"Home2 Suites by Hilton Ontario Airport",a:"4480 E Mills Cir",r:63,m:"3,060",lat:34.0752,lng:-117.5485,cls:"Extended stay, Ontario Mills",s:"Extended stay; flat seasonal profile."},
+ {n:"Stadium Village hotel (planned)",a:"Riverside Dr at Vineyard Ave, Ontario Sports Empire",r:227,m:"n/a",lat:34.0060,lng:-117.5980,plan:true,cls:"Planned, part of the Sports Empire's Stadium Village",s:"Not yet open. Announced as a 227-room hotel beside ONT Field (6,500-seat Minor League stadium, opened April 2026) and the community sports complex (8 diamonds, 8 soccer fields, opening October 2026). Expect youth-tournament and game-day weekend demand."}
+];
+const LM=[["Ontario Convention Center",34.0650,-117.5995],["Ontario Mills",34.0750,-117.5510],["Toyota Arena",34.0755,-117.5612],["ONT Field / Ontario Sports Empire",34.0055,-117.6000],["Downtown Ontario",34.0630,-117.6510]];
+
+const map=L.map('map',{zoomControl:true}).setView([34.03,-117.60],12);
+const sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Imagery &copy; Esri, Maxar, Earthstar Geographics'});
+const ref=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}',{maxZoom:19});
+const lab=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{maxZoom:19});
+const streets=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors &copy; CARTO'});
+const satGroup=L.layerGroup([sat,ref,lab]).addTo(map);
+document.getElementById('sat').onchange=e=>{if(e.target.checked){map.removeLayer(streets);satGroup.addTo(map);}else{map.removeLayer(satGroup);streets.addTo(map);}};
+
+/* approximate city limits */
+L.polygon([[34.095,-117.683],[34.095,-117.52],[33.925,-117.52],[33.925,-117.65],[34.0,-117.65],[34.0,-117.683]],{color:'#e6c86a',weight:2,dashArray:'6 4',fill:false}).addTo(map);
+
+LM.forEach(l=>L.marker([l[1],l[2]],{icon:L.divIcon({className:'',html:`<div class="lm">${l[0]}</div>`,iconAnchor:[0,0]}),interactive:false}).addTo(map));
+
+H.forEach(h=>{
+  const d=Math.round(14+Math.sqrt(h.r)*0.9);
+  const icon=L.divIcon({className:'',html:`<div class="mk${h.plan?' plan':''}" style="width:${d}px;height:${d}px">${h.r}</div>`,iconSize:[d,d],iconAnchor:[d/2,d/2],popupAnchor:[0,-d/2]});
+  const share=h.plan?'n/a':(100*h.r/TMD).toFixed(1)+'%';
+  const note=h.plan?'Announced count; not in the TMD total yet.':'Published inventory. Nightly availability is only on the hotel’s booking page; property occupancy is not public.';
+  L.marker([h.lat,h.lng],{icon}).addTo(map).bindPopup(`<h2>${h.n}</h2><p class="addr">${h.a}, Ontario. ${h.cls}.</p>
+   <div class="kv"><div><b>${h.r}</b><span>Rooms</span></div><div><b>${h.m}</b><span>Sq ft meeting</span></div><div><b>${share}</b><span>TMD share</span></div></div>
+   <p class="seas"><i>Seasonal availability</i>${h.s}</p><p class="note">${note}</p>`,{maxWidth:300});
+});
+document.getElementById('bCity').onclick=()=>map.fitBounds([[33.925,-117.683],[34.095,-117.52]]);
+document.getElementById('bDist').onclick=()=>map.fitBounds([[34.036,-117.615],[34.085,-117.540]]);
+map.fitBounds([[33.925,-117.683],[34.095,-117.52]]);
+</script>
+</body>
+</html>
