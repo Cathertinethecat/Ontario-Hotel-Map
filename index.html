@@ -6,6 +6,7 @@
 <title>Ontario Hotel Map</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="la_transit.js"></script>
 <style>
   html,body{height:100%;margin:0;font-family:"Times New Roman",Times,serif;color:#1d1c19;background:#111}
   #map{position:absolute;inset:0}
@@ -35,6 +36,8 @@
   .badge.off{background:#efece2;color:#5f5b50;border:1px solid #c9c3b2}
   .mk{background:#b3412f;color:#fff;border:1.5px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 11px "Times New Roman",Times,serif;box-shadow:0 1px 4px rgba(0,0,0,.5)}
   .mk.plan{background:#fff;color:#b3412f;border:1.5px dashed #b3412f}
+  .vm{width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid #d4a017;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+  .vm::after{content:'';position:absolute;inset:5px;border-radius:50%;background:#d4a017}
   .lm{background:rgba(31,78,121,.9);color:#fff;border-radius:3px;padding:2px 6px;font:italic 11px "Times New Roman",Times,serif;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.5)}
 </style>
 </head>
@@ -43,13 +46,18 @@
 <div class="panel" id="panel">
   <h1 id="ptog">Ontario Hotels <small id="pind">tap for legend &amp; controls</small></h1>
   <div class="body">
-  <p>Tap a marker for room count, meeting space, sources and seasonal context; the hotel name links to its official site. Marker size follows room count, color shows tier.</p>
+  <p>Tap a hotel marker for room count, meeting space, sources and seasonal context; the hotel name links to its official site. Marker size follows room count, color shows tier. Gold rings are LA28 venues; colored lines are Metro rail, dashed grey is Metrolink. Tap “LA region” to zoom out.</p>
   <div class="btns">
-    <button id="bCity">Whole city</button>
+    <button id="bCity">Ontario</button>
     <button id="bDist">Hotel district</button>
+    <button id="bLA">LA region</button>
     <label><input type="checkbox" id="sat" checked> Satellite</label>
+    <label><input type="checkbox" id="tRail" checked> Metro rail</label>
+    <label><input type="checkbox" id="tML" checked> Metrolink</label>
+    <label><input type="checkbox" id="tLA28" checked> LA28 venues</label>
   </div>
-  <p class="note" style="margin-top:8px"><span style="color:#b3412f">&#9679;</span> Full service &nbsp;<span style="color:#c98a1c">&#9679;</span> Select &nbsp;<span style="color:#2f7d4e">&#9679;</span> Extended stay &nbsp;<span style="color:#6b5ea8">&#9679;</span> Economy &nbsp;<span style="color:#b3412f">&#9711;</span> Planned</p>
+  <p class="note" style="margin-top:8px"><span style="color:#d4a017">&#9673;</span> LA28 venue &nbsp;<span style="color:#0072BC">&#9644;</span> Metro rail (line colors) &nbsp;<span style="color:#555">&#9644;</span> Metrolink<br><span style="color:#b3412f">&#9679;</span> Full service &nbsp;<span style="color:#c98a1c">&#9679;</span> Select &nbsp;<span style="color:#2f7d4e">&#9679;</span> Extended stay &nbsp;<span style="color:#6b5ea8">&#9679;</span> Economy &nbsp;<span style="color:#b3412f">&#9711;</span> Planned</p>
+  <p class="note">Regional layers: Metro rail geometry from LA Metro’s published GTFS feed, stitched to the 2025 network (Regional Connector, Pomona extension, C/K realignment); Metrolink lines and LA28 venues are placed by station and venue location and are approximate. Venue sports per the LA28 venue plan as of 2025. No rail reaches ONT or the hotel district; the nearest stations are Metrolink East Ontario (Riverside Line) and Rancho Cucamonga (San Bernardino Line), and the A Line now ends at Pomona North, nine miles west of the airport.</p>
   <p class="note">Getting around: there is no shared hotel shuttle. Fourteen hotels run their own courtesy vans to ONT (badged on their cards, per ONT’s list); the rest rely on rideshare. The one bus tying the pieces together is <a href="https://omnitrans.org/wp-content/uploads/2023/01/Route_61_jan23.pdf" target="_blank" rel="noopener">Omnitrans Route 61</a> (Pomona to Fontana via Holt Blvd, both ONT terminals and Ontario Mills, every 20 minutes); it does not stop at the Convention Center, and nothing links the airport, convention block, Mills, arena and Sports Empire in one loop.</p>
   <p class="note">40 open hotels, 5,049 rooms counted (2 unverified), of 5,461 citywide; 1,800+ planned (City of Ontario, May 2024). Positions placed by street address; boundary approximate. Room counts as of Oct 2026.</p>
   </div>
@@ -153,6 +161,17 @@ H.forEach(h=>{
    <div class="kv"><div><b>${h.r==null?'?':h.r}</b><span>Rooms</span></div><div><b>${h.m}</b><span>Sq ft meeting</span></div><div><b>${share}</b><span>City share</span></div></div>
    <p class="seas"><i>Seasonal availability</i>${h.s}</p><p class="seas"><i>Sources</i>${srcHTML(h)}${h.note?'<br><em>'+h.note+'</em>':''}</p><p class="note">${note}</p>`,{maxWidth:300,autoPanPaddingTopLeft:[10,10],autoPanPaddingBottomRight:[10,60]});
 });
+/* regional layers */
+const railG=L.layerGroup().addTo(map), mlG=L.layerGroup().addTo(map), laG=L.layerGroup().addTo(map), stG=L.layerGroup();
+TRANSIT.metro.forEach(l=>{L.polyline(l.pts,{color:'#fff',weight:7,opacity:.7}).addTo(railG);L.polyline(l.pts,{color:l.c,weight:4}).addTo(railG).bindTooltip('Metro '+l.n,{sticky:true});});
+TRANSIT.metrolink.forEach(l=>{L.polyline(l.pts,{color:'#fff',weight:6,opacity:.6}).addTo(mlG);L.polyline(l.pts,{color:'#444',weight:3,dashArray:'8 6'}).addTo(mlG).bindTooltip(l.n,{sticky:true});});
+TRANSIT.stations.forEach(s=>L.circleMarker([s[1],s[2]],{radius:3,color:'#222',weight:1,fillColor:'#fff',fillOpacity:1}).bindTooltip(s[0]).addTo(stG));
+TRANSIT.mlStations.forEach(s=>L.circleMarker([s[1],s[2]],{radius:4,color:'#444',weight:1.5,fillColor:'#fff',fillOpacity:1}).bindTooltip('Metrolink: '+s[0]).addTo(stG));
+map.on('zoomend',()=>{const on=map.getZoom()>=12&&document.getElementById('tRail').checked;if(on&&!map.hasLayer(stG))stG.addTo(map);if(!on&&map.hasLayer(stG))map.removeLayer(stG);});
+TRANSIT.venues.forEach(v=>L.marker([v[2],v[3]],{icon:L.divIcon({className:'',html:'<div class="vm" style="position:relative"></div>',iconSize:[22,22],iconAnchor:[11,11],popupAnchor:[0,-11]})}).addTo(laG).bindPopup(`<h2>${v[0]}</h2><p class="addr">${v[1]}. LA28 venue.</p><p class="seas"><i>Sports</i>${v[4]}</p><p class="addr"><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v[0]+', '+v[1])}" target="_blank" rel="noopener">Open in Google Maps</a></p>`,{maxWidth:300}));
+const tog=(id,g)=>document.getElementById(id).onchange=e=>{e.target.checked?g.addTo(map):map.removeLayer(g);if(id==='tRail'&&!e.target.checked)map.removeLayer(stG);};
+tog('tRail',railG);tog('tML',mlG);tog('tLA28',laG);
+document.getElementById('bLA').onclick=()=>map.fitBounds([[33.70,-118.55],[34.25,-117.25]]);
 document.getElementById('bCity').onclick=()=>map.fitBounds([[33.925,-117.683],[34.095,-117.52]]);
 document.getElementById('bDist').onclick=()=>map.fitBounds([[34.036,-117.615],[34.085,-117.540]]);
 map.fitBounds([[33.925,-117.683],[34.095,-117.52]]);
