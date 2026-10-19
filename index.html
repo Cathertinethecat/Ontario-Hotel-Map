@@ -32,6 +32,7 @@
   .seas{border-top:1px solid #c9c3b2;padding-top:6px;margin:0;font-size:.9rem}
   .seas i{display:block;margin-bottom:2px}
   .note{font-size:.78rem;color:#5f5b50;margin:6px 0 0}
+  #tierToggles label{display:block;width:100%;border:none;padding:2px 0;background:none}
   .badge{display:inline-block;font-size:.75rem;background:#1f4e79;color:#fff;border-radius:3px;padding:2px 7px;margin:0 0 8px}
   .badge.off{background:#efece2;color:#5f5b50;border:1px solid #c9c3b2}
   .mk{background:#b3412f;color:#fff;border:1.5px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 11px "Times New Roman",Times,serif;box-shadow:0 1px 4px rgba(0,0,0,.5)}
@@ -58,7 +59,14 @@
     <label><input type="checkbox" id="tML" checked> Metrolink</label>
     <label><input type="checkbox" id="tLA28" checked> LA28 venues</label>
   </div>
-  <p class="note" style="margin-top:8px"><span style="color:#b3412f">&#9679;</span> Full service &nbsp;<span style="color:#c98a1c">&#9679;</span> Select &nbsp;<span style="color:#2f7d4e">&#9679;</span> Extended stay &nbsp;<span style="color:#6b5ea8">&#9679;</span> Economy &nbsp;<span style="color:#b3412f">&#9711;</span> Planned<br><span style="color:#d4a017">&#9673;</span> LA28 venue &nbsp;<span style="color:#0072BC">&#9644;</span> Metro rail &nbsp;<span style="color:#555">&#9644;</span> Metrolink</p>
+  <div class="btns" id="tierToggles"><b style="font-size:.85rem;width:100%">Hotels by tier</b>
+    <label><input type="checkbox" data-tier="full" checked> <span style="color:#b3412f">&#9679;</span> Full service</label>
+    <label><input type="checkbox" data-tier="select" checked> <span style="color:#c98a1c">&#9679;</span> Select service</label>
+    <label><input type="checkbox" data-tier="ext" checked> <span style="color:#2f7d4e">&#9679;</span> Extended stay</label>
+    <label><input type="checkbox" data-tier="econ" checked> <span style="color:#6b5ea8">&#9679;</span> Economy</label>
+    <label><input type="checkbox" data-tier="plan" checked> <span style="color:#b3412f">&#9711;</span> Planned</label>
+  </div>
+  <p class="note" style="margin-top:8px"><span style="color:#d4a017">&#9673;</span> LA28 venue &nbsp;<span style="color:#0072BC">&#9644;</span> Metro rail &nbsp;<span style="color:#555">&#9644;</span> Metrolink</p>
   <p class="note"><a href="#" id="aboutTog">About the data</a></p>
   <div id="about" style="display:none">
     <p class="note">40 open hotels, 5,049 rooms counted, of 5,461 citywide; 1,800+ planned (City of Ontario, May 2024). Room counts as of Oct 2026, each cited on its card. Hotel roster and addresses from GOCAL; positions placed by address.</p>
@@ -158,12 +166,13 @@ L.polygon([[34.095,-117.683],[34.095,-117.52],[33.925,-117.52],[33.925,-117.65],
 
 LM.forEach(l=>L.marker([l[1],l[2]],{icon:L.divIcon({className:'',html:`<div class="lm">${l[0]}</div>`,iconAnchor:[0,0]}),interactive:false}).addTo(map));
 
+const TG={};Object.keys(CAT).forEach(k=>TG[k]=L.layerGroup().addTo(map));
 H.forEach(h=>{
   const d=Math.round(14+Math.sqrt(h.r||60)*0.9);
   const icon=L.divIcon({className:'',html:`<div class="mk${h.plan?' plan':''}" style="width:${d}px;height:${d}px;${h.plan?'':'background:'+CAT[h.t].c}">${h.r==null?'?':h.r}</div>`,iconSize:[d,d],iconAnchor:[d/2,d/2],popupAnchor:[0,-d/2]});
   const share=(h.plan||h.r==null)?'n/a':(100*h.r/TMD).toFixed(1)+'%';
   const note=h.plan?'Announced count; part of the 1,800+ rooms the City lists as planned.':'Published inventory. Nightly availability is only on the hotel’s booking page; property occupancy is not public.';
-  L.marker([h.lat,h.lng],{icon}).addTo(map).bindPopup(`${imgHTML(h)}<h2>${nameHTML(h)}</h2><p class="addr">${h.a}, Ontario. ${h.cls}.<br>${svHTML(h)}</p>${shuttleHTML(h)}
+  L.marker([h.lat,h.lng],{icon}).addTo(TG[h.t]).bindPopup(`${imgHTML(h)}<h2>${nameHTML(h)}</h2><p class="addr">${h.a}, Ontario. ${h.cls}.<br>${svHTML(h)}</p>${shuttleHTML(h)}
    <div class="kv"><div><b>${h.r==null?'?':h.r}</b><span>Rooms</span></div><div><b>${h.m}</b><span>Sq ft meeting</span></div><div><b>${share}</b><span>City share</span></div></div>
    <p class="seas"><i>Seasonal availability</i>${h.s}</p><p class="seas"><i>Sources</i>${srcHTML(h)}${h.note?'<br><em>'+h.note+'</em>':''}</p><p class="note">${note}</p>`,{maxWidth:300,autoPanPaddingTopLeft:[10,10],autoPanPaddingBottomRight:[10,60]});
 });
@@ -178,6 +187,7 @@ TRANSIT.venues.forEach(v=>{const u='https://la28.org/en/games-plan/venues/'+v[0]
 const tog=(id,g)=>document.getElementById(id).onchange=e=>{e.target.checked?g.addTo(map):map.removeLayer(g);if(id==='tRail'&&!e.target.checked)map.removeLayer(stG);};
 tog('tRail',railG);tog('tML',mlG);tog('tLA28',laG);
 document.getElementById('bLA').onclick=()=>map.fitBounds([[33.70,-118.55],[34.25,-117.25]]);
+document.querySelectorAll('#tierToggles input').forEach(cb=>cb.onchange=e=>{const g=TG[e.target.dataset.tier];e.target.checked?g.addTo(map):map.removeLayer(g);});
 document.getElementById('bCity').onclick=()=>map.fitBounds([[33.925,-117.683],[34.095,-117.52]]);
 document.getElementById('bDist').onclick=()=>map.fitBounds([[34.036,-117.615],[34.085,-117.540]]);
 map.fitBounds([[33.925,-117.683],[34.095,-117.52]]);
