@@ -10,9 +10,9 @@
 <script src="https://unpkg.com/leaflet.gridlayer.googlemutant@0.14.1/dist/Leaflet.GoogleMutant.js"></script>
 <script>const GKEY="AIzaSyBv-3fjCEu5UzXlyiA2OGjzyUl3tprLpxY";window.gmReady=function(){window._gmLoaded=true;if(window.onGoogleReady)window.onGoogleReady();};</script>
 <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBv-3fjCEu5UzXlyiA2OGjzyUl3tprLpxY&loading=async&callback=gmReady&v=weekly"></script>
-<script src="rates_history.js?v=1792473276"></script>
-<script src="la_transit.js?v=1792473276"></script>
-<script src="neighbors.js?v=1792473276"></script>
+<script src="rates_history.js?v=1792473277"></script>
+<script src="la_transit.js?v=1792473277"></script>
+<script src="neighbors.js?v=1792473277"></script>
 <style>
   html,body{height:100%;margin:0;font-family:"Times New Roman",Times,serif;color:#1d1c19;background:#111}
   #map{position:absolute;inset:0}
@@ -121,9 +121,55 @@
   .leaflet-popup-content{max-height:calc(100vh - 150px);max-height:calc(100dvh - 150px);overflow:auto;overscroll-behavior:contain}
   .panel .body,.rpanel .rl,.kpanel .kb{overscroll-behavior:contain}
 </style>
+<style>
+/* About this map: summary panel, opens on load */
+.ipanel{position:absolute;top:10px;right:10px;bottom:10px;width:min(340px,calc(100% - 20px));background:rgba(250,248,242,.98);border:1px solid #c9c3b3;border-radius:6px;box-shadow:0 2px 10px rgba(0,0,0,.35);z-index:1250;display:none;flex-direction:column;font-family:"Times New Roman",Times,serif;color:#1b1b1b}
+.ipanel.open{display:flex}
+.ipanel .ih{padding:8px 10px 6px;border-bottom:1px solid #d8d3c5;position:relative}
+.ipanel .ih h2{margin:0 64px 2px 0;font-size:1.05rem;color:#1f2a3a}
+.ipanel .ih .sub{color:#5f5b50;font-size:.8rem;font-style:italic;margin-right:64px}
+.ipanel .ibtn{position:absolute;top:5px;border:none;background:none;cursor:pointer;color:#5f5b50;width:30px;height:30px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:4px}
+.ipanel .ibtn:hover{background:#ebe7db;color:#1f2a3a}
+.ipanel .ifs{right:38px}.ipanel .ix{right:6px;font-size:1.3rem}
+.ipanel .ib{overflow:auto;flex:1;padding:8px 12px 12px;overscroll-behavior:contain}
+.ipanel .iin{max-width:760px;margin:0 auto}
+.ipanel h3{font-size:.95rem;font-style:italic;margin:10px 0 4px}
+.ipanel p{font-size:.86rem;line-height:1.4;margin:0 0 6px}
+.ipanel .ist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:6px 0}
+.ipanel .ist div{border:1px solid #c9c3b3;background:#fff;padding:5px 7px;font-size:.74rem;line-height:1.25}
+.ipanel .ist b{display:block;font-size:1.15rem}
+.ipanel table{border-collapse:collapse;width:100%;font-size:.8rem;line-height:1.3}
+.ipanel th{font-style:italic;text-align:left;border-bottom:1px solid #1b1b1b;padding:3px 4px}
+.ipanel td{border-bottom:1px solid #ddd7c9;padding:5px 4px;vertical-align:top}
+.ipanel td.n,.ipanel th.n{text-align:right;white-space:nowrap}
+.ipanel td.sw{width:22px;padding-top:6px}
+.ipanel .ikey{display:grid;grid-template-columns:34px 1fr;gap:6px 8px;align-items:center;font-size:.8rem;line-height:1.3;margin-top:8px}
+.ipanel .isrc{background:#f2efe7;border:1px solid #c9c3b3;padding:8px 10px;margin-top:10px}
+.ipanel .isrc p{font-size:.8rem;margin:0}
+.ipanel .shb{display:inline-block;font-size:.6rem;line-height:1.05;text-align:center;background:#1f3a5f;color:#fff;padding:2px 3px}
+.ipanel.full{left:10px;right:10px;width:auto}
+.ipanel.full .ist{grid-template-columns:repeat(4,minmax(0,1fr))}
+.ipanel.full .ikey{grid-template-columns:34px 1fr 34px 1fr}
+.ipanel.full p,.ipanel.full table{font-size:.95rem}
+@media (max-width:700px){.ipanel{top:auto;height:60%;left:10px;right:10px;width:auto}.ipanel.full{top:10px;height:auto}}
+</style>
 </head>
 <body>
 <div id="map"></div>
+<div class="ipanel open" id="ipanel" role="dialog" aria-labelledby="ipTitle"><div class="ih"><h2 id="ipTitle">About this map</h2><div class="sub">Where LA28 visitors could stay in Ontario and the Inland Empire</div><button type="button" class="ibtn ifs" id="ipFull" aria-label="Full screen" title="Full screen"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"/></svg></button><button type="button" class="ibtn ix" id="ipClose" aria-label="Close" title="Close">&times;</button></div><div class="ib"><div class="iin">
+<p>Every open hotel in Ontario, California, plus the hotels in nearby cities from El Monte to Yucaipa, drawn with official city limits, Metro and Metrolink rail, and the LA28 Olympic venues. It tests one idea: whether Ontario can serve as an overnight hub for Games visitors. Tap any hotel for its card: rooms, meeting space, nightly rates, ONT shuttle, a live Google rating, and every source cited.</p>
+<div class="ist"><div><b>40</b>open hotels in Ontario, plus 3 planned</div><div><b>5,151</b>rooms in Ontario’s open hotels</div><div><b>141</b>more hotels across 34 nearby cities</div><div><b>42</b>LA28 venues with competition schedules</div></div>
+<h3>Hotel legend</h3>
+<table><thead><tr><th></th><th>Tier, by marker color</th><th class="n">Hotels</th><th class="n">Rooms</th></tr></thead><tbody><tr><td class="sw"><svg width="18" height="18" viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="11" r="9" fill="#b3412f" stroke="#fff" stroke-width="2"/></svg></td><td><b>Full service / convention.</b> Restaurant, bar and banquet space; hosts team delegations.</td><td class="n">8</td><td class="n">1,920</td></tr><tr><td class="sw"><svg width="18" height="18" viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="11" r="9" fill="#c98a1c" stroke="#fff" stroke-width="2"/></svg></td><td><b>Select service.</b> Mid-priced, breakfast or a small market, small meeting rooms.</td><td class="n">8</td><td class="n">926</td></tr><tr><td class="sw"><svg width="18" height="18" viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="11" r="9" fill="#2f7d4e" stroke="#fff" stroke-width="2"/></svg></td><td><b>Extended stay.</b> Suites with kitchens and weekly rates.</td><td class="n">7</td><td class="n">887</td></tr><tr><td class="sw"><svg width="18" height="18" viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="11" r="9" fill="#6b5ea8" stroke="#fff" stroke-width="2"/></svg></td><td><b>Economy.</b> Motels and budget inns, few amenities.</td><td class="n">17</td><td class="n">1,418</td></tr><tr><td class="sw"><svg width="18" height="18" viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="11" r="8.5" fill="#fff" stroke="#b3412f" stroke-width="2.5" stroke-dasharray="4 3"/></svg></td><td><b>Planned.</b> Announced or approved, not yet open.</td><td class="n">3</td><td class="n">827</td></tr></tbody></table>
+<p style="font-size:.74rem;color:#5f5b50;margin-top:4px">Counts are Ontario only; the same colors mark hotels in every other city.</p>
+<div class="ikey">
+<svg width="34" height="22" viewBox="0 0 34 22" aria-hidden="true"><circle cx="6" cy="11" r="4" fill="#2f7d4e"/><circle cx="23" cy="11" r="9" fill="#2f7d4e"/></svg><span><b>Size</b> grows with the hotel’s room count.</span>
+<svg width="34" height="22" viewBox="0 0 34 22" aria-hidden="true"><circle cx="17" cy="11" r="8.5" fill="#c98a1c" stroke="#1b1b1b" stroke-width="1.4" stroke-dasharray="3 2"/></svg><span><b>Dashed outline:</b> another city’s hotel, placed by address.</span>
+<svg width="34" height="22" viewBox="0 0 34 22" aria-hidden="true"><circle cx="17" cy="11" r="10.5" fill="#b3412f"/><text x="17" y="14.5" text-anchor="middle" font-family="Times New Roman,serif" font-size="9" font-weight="700" fill="#fff">436</text></svg><span><b>Numbered dot:</b> one city’s rooms gathered; tap to spread.</span>
+<span style="text-align:center"><span class="shb">ONT<br>shuttle</span></span><span><b>Badge:</b> one of 14 hotels running its own airport van.</span>
+</div>
+<div class="isrc"><h3 style="margin-top:0">How it was sourced and verified</h3><p>Ontario’s hotel roster comes from Greater Ontario California (GOCAL) and the City of Ontario’s info sheets; other cities’ hotels come from HotelGuides and HotelPlanner, with room counts and meeting space checked against each hotel’s official site or a meetings directory (Cvent, Meetings &amp; Conventions, Northstar). Nightly rates are an October 2026 snapshot from Kayak and Hotels.com, city limits are the California Board of Equalization’s official boundaries, and LA28 venues and schedules cite la28.org only. On October 19, 2026, every card got a <b>link audit</b>: AI agents (Claude Sonnet) opened each link to confirm it loads and points at the business or source named, compared each room count and meeting figure with the page it cites, and anything dead, wrong or out of date was fixed or removed. The audit is automated and can miss what a person would catch; Google ratings, reviews and photos load live and are not part of it. Full sources are under “About the data” in the Legend.</p></div>
+</div></div></div>
 <div class="rpanel" id="rpanel"><div class="rh"><h2 id="rpTitle"></h2><div class="sub" id="rpSub"></div><button class="rx" id="rpClose" aria-label="close">&times;</button><div class="btns" style="margin-top:6px"><button type="button" id="rpBack">&#8592; Back to legend</button><button type="button" id="rpSpread">Spread on map</button><button type="button" id="rpRetry" style="display:none">Retry missing ratings</button></div></div><div class="rsort"><span style="font-size:.78rem;color:#5f5b50;align-self:center">Sort:</span><button data-rs="rt" class="on">Rating</button><button data-rs="rooms">Rooms</button><button data-rs="tier">Tier</button><button data-rs="az">A to Z</button></div><div class="rl" id="rpList"></div></div>
 <div class="kpanel" id="kpanel"><div class="kh"><h2>Map key</h2><button class="kx kmin" id="kpMin" aria-label="minimize" title="Shrink to title bar">&#8211;</button><button class="kx" id="kpClose" aria-label="close">&times;</button><div class="btns" style="margin-top:6px;align-items:center"><button type="button" id="kpBack">&#8592; Back to legend</button><span class="kz" style="margin-left:6px"><span style="font-size:.78rem;color:#5f5b50">Text size</span> <button type="button" id="kpMinus" aria-label="smaller">&minus;</button><button type="button" id="kpPlus" aria-label="larger">+</button></span></div></div><div class="kb" id="kpBody">
 <div class="khint">Tap a section title to open or close it. Hover over or tap an underlined item for its definition.<span class="kall" id="kpAll">Collapse all</span></div><div class="ks"><div class="kst">Hotel tiers</div><div class="ksn">Marker color is the tier; the number in the circle is the room count.</div><div class="kr"><span class="ksw"><span style="color:#b3412f;font-size:1.3em">&#9679;</span></span><div class="kl"><span class="kinfo" data-def="Restaurant, bar and meeting space on site, usually 150 or more rooms. Convention and airport hotels." title="Restaurant, bar and meeting space on site, usually 150 or more rooms. Convention and airport hotels.">Full service</span></div></div><div class="kr"><span class="ksw"><span style="color:#c98a1c;font-size:1.3em">&#9679;</span></span><div class="kl"><span class="kinfo" data-def="Limited food and small meeting rooms. Hampton, Courtyard, Holiday Inn Express and similar." title="Limited food and small meeting rooms. Hampton, Courtyard, Holiday Inn Express and similar.">Select service</span></div></div><div class="kr"><span class="ksw"><span style="color:#2f7d4e;font-size:1.3em">&#9679;</span></span><div class="kl"><span class="kinfo" data-def="Suites with kitchens, built for stays of a week or more. Residence Inn, Home2, Extended Stay America." title="Suites with kitchens, built for stays of a week or more. Residence Inn, Home2, Extended Stay America.">Extended stay</span></div></div><div class="kr"><span class="ksw"><span style="color:#6b5ea8;font-size:1.3em">&#9679;</span></span><div class="kl"><span class="kinfo" data-def="Motels and budget inns with few or no amenities." title="Motels and budget inns with few or no amenities.">Economy</span></div></div></div><div class="ks"><div class="kst">Marker styles</div><div class="kr"><span class="ksw"><span style="display:inline-block;width:14px;height:14px;border-radius:50%;border:1.5px dashed #b3412f;color:#b3412f;font-size:9px;line-height:12px;text-align:center">?</span></span><div class="kl"><span class="kinfo" data-def="Planned hotel, not yet open." title="Planned hotel, not yet open.">Dashed outline</span></div></div><div class="kr"><span class="ksw"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#c98a1c;outline:1.5px dashed #1d1c19"></span></span><div class="kl"><span class="kinfo" data-def="Hotel outside the City of Ontario." title="Hotel outside the City of Ontario.">Dark dashed ring</span></div></div><div class="kr"><span class="ksw"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#c98a1c;vertical-align:middle"></span> <span style="display:inline-block;width:15px;height:15px;border-radius:50%;background:#c98a1c;vertical-align:middle"></span></span><div class="kl">Bigger marker = more rooms</div></div><div class="kr"><span class="ksw"><span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#1f4e79;color:#fff;font-size:9px;line-height:16px;text-align:center">12</span></span><div class="kl"><span class="kinfo" data-def="Number of hotels in that city. Tap the circle to spread the hotels out; tap "list" for a sortable list with live Google ratings." title="Number of hotels in that city. Tap the circle to spread the hotels out; tap "list" for a sortable list with live Google ratings.">City dot</span></div></div></div><div class="ks"><div class="kst">Other markers</div><div class="kr"><span class="ksw"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#fff;border:2px solid #2f7d4e"></span></span><div class="kl">Ontario Sports Empire</div></div><div class="kr"><span class="ksw"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid #6a3fb5"></span></span><div class="kl"><span class="kinfo" data-def="Bus rapid transit stations." title="Bus rapid transit stations.">West Valley Connector BRT</span></div></div><div class="kr"><span class="ksw"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid #d4a017"></span></span><div class="kl"><span class="kinfo" data-def="Larger circle = bigger spectator capacity." title="Larger circle = bigger spectator capacity.">LA28 venue</span></div></div></div><div class="ks"><div class="kst">Basemap and boundaries</div><div class="ksn">Google Maps, satellite or street view.</div><div class="kr"><span class="ksw"><span style="color:#FFD600;font-weight:700;font-size:1.2em">&#9644;</span></span><div class="kl"><span class="kinfo" data-def="One color per city." title="One color per city.">City limits</span></div></div><div class="kr"><span class="ksw"><span style="color:#9e9e9e;font-weight:700;font-size:1.2em">&#9638;</span></span><div class="kl">Unincorporated county land</div></div></div>
@@ -131,7 +177,7 @@
 <div class="panel" id="panel">
   <h1 id="ptog">Legend <small id="pind">tap for legend &amp; controls</small></h1>
   <div class="body">
-  <div class="btns" id="keyOpenRow" style="margin:0 0 6px"><button type="button" id="keyOpen">Open map key</button></div>
+  <div class="btns" id="keyOpenRow" style="margin:0 0 6px"><button type="button" id="keyOpen">Open map key</button> <button type="button" id="introOpen">About this map</button></div>
   <p>Tap any marker for details. Hotel markers are sized by rooms and colored by tier; names link to official sites.</p>
   <div class="btns"><b style="font-size:.85rem;width:100%">Zoom to area</b>
     <button id="bCity">Ontario</button>
@@ -558,6 +604,22 @@ function auditStamp(el){if(!el||el.querySelector('.astamp'))return;const d=docum
 map.on('popupopen',e=>{const el=e.popup.getElement()&&e.popup.getElement().querySelector('.leaflet-popup-content');auditStamp(el);});
 /* keep cards on screen: re-run the popup's layout and auto-pan when the card's content or size really changes (live data, photos, opened sections, viewport). The observer is paused while Leaflet re-measures, so its own style writes cannot re-trigger it, and scroll positions in the card are put back after the measure. A page button outside the map that zooms to an area away from the open card closes the card, so the button goes where it says instead of being pulled back to the card. */
 map.on('popupopen',e=>{const pp=e.popup,c=pp._contentNode;if(!c)return;let t,off=0,u=0,mv=0;const ap=pp.options.autoPan;const O={childList:true,subtree:true,attributes:true,characterData:true};const run=()=>{if(off)return;if(map._animatingZoom)return fix();ob.disconnect();const sv=[c,...c.querySelectorAll('*')].filter(n=>n.scrollTop).map(n=>[n,n.scrollTop]);try{pp._updateLayout();sv.forEach(([n,s])=>{if(n.scrollTop!==s)n.scrollTop=s;});pp._updatePosition();pp._adjustPan();}catch(_){}if(!off)ob.observe(c,O);};const fix=()=>{clearTimeout(t);t=setTimeout(run,80);};const C=map.getContainer(),Z=()=>{u=0},EV=['pointerdown','touchstart','wheel','keydown'];const U=ev=>{if(!C.contains(ev.target)){u=Date.now();requestAnimationFrame(()=>requestAnimationFrame(Z));}};document.addEventListener('click',U,true);EV.forEach(n=>C.addEventListener(n,Z,true));const M={movestart:()=>{if(u){mv=1;pp.options.autoPan=false;}},zoomend:()=>{if(!mv)fix();},moveend:()=>{if(!mv)return;mv=0;pp.options.autoPan=ap;const ll=pp.getLatLng();if(ll&&!map.getBounds().contains(ll))map.closePopup(pp);else fix();},resize:fix};const imgs=()=>c.querySelectorAll('img').forEach(i=>{if(i._kv!==fix){i._kv=fix;i.addEventListener('load',fix);}});const ob=new MutationObserver(()=>{fix();imgs();});ob.observe(c,O);const ro=window.ResizeObserver?new ResizeObserver(fix):null;if(ro)ro.observe(c);map.on(M);imgs();fix();pp.once('remove',()=>{off=1;pp.options.autoPan=ap;ob.disconnect();if(ro)ro.disconnect();clearTimeout(t);map.off(M);document.removeEventListener('click',U,true);EV.forEach(n=>C.removeEventListener(n,Z,true));});});
+</script>
+<script>
+/* About this map panel: open on load, full screen toggle, close; reopen from the Legend; closes when a city table opens */
+(function(){const ip=document.getElementById('ipanel');if(!ip)return;
+const fsIn='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"/></svg>';
+const fsOut='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 2v4H2M14 6h-4V2M10 14v-4h4M2 10h4v4"/></svg>';
+const fb=document.getElementById('ipFull');
+const setFull=on=>{ip.classList.toggle('full',on);fb.innerHTML=on?fsOut:fsIn;fb.setAttribute('aria-label',on?'Exit full screen':'Full screen');fb.title=fb.getAttribute('aria-label');};
+fb.addEventListener('click',()=>setFull(!ip.classList.contains('full')));
+document.getElementById('ipClose').addEventListener('click',()=>{ip.classList.remove('open');setFull(false);});
+const ro=document.getElementById('introOpen');if(ro)ro.addEventListener('click',e=>{e.stopPropagation();ip.classList.add('open');});
+if(window.L&&L.DomEvent){L.DomEvent.disableClickPropagation(ip);L.DomEvent.disableScrollPropagation(ip);}
+['mousedown','touchstart','wheel','dblclick'].forEach(ev=>ip.addEventListener(ev,e=>e.stopPropagation(),{passive:true}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&ip.classList.contains('open')){ip.classList.remove('open');setFull(false);}});
+const rp=document.getElementById('rpanel');if(rp)new MutationObserver(()=>{if(rp.classList.contains('open')){ip.classList.remove('open');setFull(false);}}).observe(rp,{attributes:true,attributeFilter:['class']});
+})();
 </script>
 </body>
 </html>
